@@ -2,4 +2,5 @@
 
 // Barrel files
 export 'di/di.barrel.dart';
+export 'navigation/navigation.barrel.dart';
 export 'services/services.barrel.dart';
