@@ -52,12 +52,32 @@ class AppUiConstants {
   static const double screenWidth = 390.0;
   static const double contentWidth = 350.0;
 
-  // Component Heights
+  // Portrait Dimensions
   static const double headerHeight = 90.0;
   static const double tabBarHeight = 50.0;
   static const double searchBarHeight = 40.0;
   static const double listItemHeight = 80.0;
   static const double bottomNavHeight = 70.0;
+
+  // Landscape Dimensions
+  static const double landscapeHeaderHeight = 60.0;
+  static const double landscapeTabBarHeight = 45.0;
+  static const double landscapeSearchBarHeight = 36.0;
+  static const double landscapeListItemHeight = 90.0;
+  static const double landscapeBottomNavHeight = 55.0;
+  static const double landscapeSidebarWidth = 120.0;
+
+  // Grid Layout
+  // Calculated based on actual card content:
+  // - Padding: 24px (12px * 2)
+  // - Contract info: ~180px (name + date + icon + spacing)
+  // - Price info: ~320px (price + percentage + 2 buttons + spacing)
+  // - Minimum width: max(180px, 320px) + 24px = ~344px
+  static const double gridMinCardWidth = 340.0;
+  static const double gridMaxCardWidth = 400.0;
+  static const double gridCardAspectRatio = 3.0;
+  static const double gridCrossAxisSpacing = 12.0;
+  static const double gridMainAxisSpacing = 12.0;
 
   // Button Dimensions
   static const double buttonHeight = 40.0;
@@ -161,6 +181,12 @@ class AppUiConstants {
         color: AppUiConstants.secondaryText,
       );
 
+  static TextStyle get tinyText => TextStyle(
+        fontSize: tinyFontSize,
+        fontWeight: FontWeight.normal,
+        color: AppUiConstants.secondaryText,
+      );
+
   static TextStyle get buttonText => TextStyle(
         fontSize: secondaryFontSize,
         fontWeight: FontWeight.bold,
@@ -236,4 +262,55 @@ class AppUiConstants {
         gradient: notificationBadgeGradient,
         shape: BoxShape.circle,
       );
+
+  // ==================== ORIENTATION HELPERS ====================
+
+  /// Get header height based on orientation
+  static double getHeaderHeight(bool isLandscape) {
+    return isLandscape ? landscapeHeaderHeight : headerHeight;
+  }
+
+  /// Get tab bar height based on orientation
+  static double getTabBarHeight(bool isLandscape) {
+    return isLandscape ? landscapeTabBarHeight : tabBarHeight;
+  }
+
+  /// Get search bar height based on orientation
+  static double getSearchBarHeight(bool isLandscape) {
+    return isLandscape ? landscapeSearchBarHeight : searchBarHeight;
+  }
+
+  /// Get list item height based on orientation
+  static double getListItemHeight(bool isLandscape) {
+    return isLandscape ? landscapeListItemHeight : listItemHeight;
+  }
+
+  /// Get bottom nav height based on orientation
+  static double getBottomNavHeight(bool isLandscape) {
+    return isLandscape ? landscapeBottomNavHeight : bottomNavHeight;
+  }
+
+  /// Calculate number of grid columns based on available width
+  /// Returns optimal number of columns (1-4) based on card width constraints
+  static int calculateGridColumns(double availableWidth) {
+    // Calculate max columns based on minimum card width
+    final maxColumns = (availableWidth / gridMinCardWidth).floor();
+    
+    // Calculate min columns based on maximum card width
+    final minColumns = (availableWidth / gridMaxCardWidth).ceil();
+    
+    // Use the larger of the two to ensure optimal card sizing
+    // If minColumns > maxColumns, it means we can fit fewer columns with max card width
+    final optimalColumns = maxColumns > minColumns ? maxColumns : minColumns;
+    
+    // Ensure at least 1 column and at most 4 columns
+    return optimalColumns.clamp(1, 4);
+  }
+
+  /// Calculate optimal card width for grid
+  static double calculateCardWidth(double availableWidth, int columns) {
+    final totalSpacing = (columns - 1) * gridCrossAxisSpacing;
+    final padding = screenPadding * 2;
+    return (availableWidth - totalSpacing - padding) / columns;
+  }
 }
