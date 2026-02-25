@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-/// Portfolio Screen - Shows user's portfolio
-class PortfolioScreen extends StatelessWidget {
-  const PortfolioScreen({super.key});
+/// Favorites Screen - Shows user's favorite items
+class FavoritesScreen extends StatelessWidget {
+  const FavoritesScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -12,18 +12,18 @@ class PortfolioScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.account_balance_wallet,
+              Icons.trending_up,
               size: 64,
               color: Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(height: 16),
             Text(
-              'Wallet',
+              'Favorites',
               style: Theme.of(context).textTheme.headlineMedium,
             ),
             const SizedBox(height: 8),
             Text(
-              'Your Wallet will be displayed here',
+              'Your favorite items will be displayed here',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.grey,
                   ),

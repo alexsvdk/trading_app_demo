@@ -14,6 +14,10 @@ class AppUiConstants {
   static const Color secondaryGradientStart = Color(0xFF6768E1); // Purple
   static const Color secondaryGradientEnd = Color(0xFF4A419C); // Dark Purple
 
+  // Navbar Gradient Colors
+  static const Color navbarGradientStart = Color(0xFF6768E1); // Purple
+  static const Color navbarGradientEnd = Color(0xFF4A419C); // Dark Purple
+
   // Active Tab Color
   static const Color activeTabColor = Color(0xFF436EDD); // Solid Blue
 
@@ -67,6 +71,21 @@ class AppUiConstants {
   static const double landscapeBottomNavHeight = 55.0;
   static const double landscapeSidebarWidth = 120.0;
 
+  // Navbar Cutout Dimensions
+  static const double navbarCutoutRadius = 35.0;
+  static const double navbarCutoutWidth = 140.0;
+  static const double navbarCutoutDepth = 18.0;
+  static const double navbarCutoutMultiplier = 1.0;
+
+  // Navbar Shadow (Figma design)
+  static const double navbarShadowLeftBlur = 28.0;
+  static const double navbarShadowLeftOffset = -3.0;
+  static const double navbarShadowLeftOpacity = 0.25;
+  
+  static const double navbarShadowRightBlur = 4.0;
+  static const double navbarShadowRightOffset = 7.0;
+  static const double navbarShadowRightOpacity = 0.25;
+
   // Grid Layout
   // Calculated based on actual card content:
   // - Padding: 24px (12px * 2)
@@ -87,6 +106,21 @@ class AppUiConstants {
   static const double tabIconSize = 24.0;
   static const double navbarIconSize = 24.0;
   static const double chartIconSize = 24.0;
+  static const double fabIconSize = 24.0;
+
+  // ==================== FAB (Floating Action Button) ====================
+
+  // FAB Dimensions
+  static const double fabSize = 56.0; // Total diameter including padding
+  static const double fabPadding = 8.0;
+  static const double fabGap = 8.0;
+  static const double fabBorderRadius = 500.0; // Circle
+  static const double fabRotation = 45.0; // Degrees
+
+  // FAB Shadow
+  static const double fabShadowBlur = 8.0;
+  static const double fabShadowOffset = 2.0;
+  static const double fabShadowOpacity = 0.2;
 
   // ==================== SPACING ====================
 
@@ -128,140 +162,152 @@ class AppUiConstants {
   // ==================== GRADIENTS ====================
 
   static LinearGradient get brandGradient => const LinearGradient(
-        colors: [
-          brandGradientStart,
-          brandGradientMiddle,
-          brandGradientEnd,
-        ],
-      );
+    colors: [brandGradientStart, brandGradientMiddle, brandGradientEnd],
+  );
 
   static LinearGradient get secondaryGradient => const LinearGradient(
-        colors: [
-          secondaryGradientStart,
-          secondaryGradientEnd,
-        ],
-      );
+    colors: [secondaryGradientStart, secondaryGradientEnd],
+  );
+
+  static LinearGradient get navbarGradient => const LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [navbarGradientEnd, navbarGradientStart],
+  );
 
   static LinearGradient get notificationBadgeGradient => const LinearGradient(
-        colors: [
-          notificationBadgeStart,
-          notificationBadgeEnd,
-        ],
-      );
+    colors: [notificationBadgeStart, notificationBadgeEnd],
+  );
+
+  static LinearGradient get fabGradient => const LinearGradient(
+    begin: Alignment(-0.91, 0.0),
+    end: Alignment(0.91, 0.0),
+    colors: [brandGradientStart, brandGradientMiddle, brandGradientEnd],
+    stops: [0.0991, 0.5329, 0.9156],
+  );
 
   // ==================== TEXT STYLES ====================
 
   static TextStyle get largeHeading => TextStyle(
-        fontSize: largeHeadingFontSize,
-        fontWeight: FontWeight.bold,
-        color: primaryText,
-      );
+    fontSize: largeHeadingFontSize,
+    fontWeight: FontWeight.bold,
+    color: primaryText,
+  );
 
   static TextStyle get mediumHeading => TextStyle(
-        fontSize: mediumHeadingFontSize,
-        fontWeight: FontWeight.bold,
-        color: primaryText,
-      );
+    fontSize: mediumHeadingFontSize,
+    fontWeight: FontWeight.bold,
+    color: primaryText,
+  );
 
   static TextStyle get bodyText => TextStyle(
-        fontSize: bodyFontSize,
-        fontWeight: FontWeight.normal,
-        color: primaryText,
-      );
+    fontSize: bodyFontSize,
+    fontWeight: FontWeight.normal,
+    color: primaryText,
+  );
 
   static TextStyle get secondaryTextStyle => TextStyle(
-        fontSize: secondaryFontSize,
-        fontWeight: FontWeight.normal,
-        color: AppUiConstants.secondaryText,
-      );
+    fontSize: secondaryFontSize,
+    fontWeight: FontWeight.normal,
+    color: AppUiConstants.secondaryText,
+  );
 
   static TextStyle get smallText => TextStyle(
-        fontSize: smallFontSize,
-        fontWeight: FontWeight.normal,
-        color: AppUiConstants.secondaryText,
-      );
+    fontSize: smallFontSize,
+    fontWeight: FontWeight.normal,
+    color: AppUiConstants.secondaryText,
+  );
 
   static TextStyle get tinyText => TextStyle(
-        fontSize: tinyFontSize,
-        fontWeight: FontWeight.normal,
-        color: AppUiConstants.secondaryText,
-      );
+    fontSize: tinyFontSize,
+    fontWeight: FontWeight.normal,
+    color: AppUiConstants.secondaryText,
+  );
 
   static TextStyle get buttonText => TextStyle(
-        fontSize: secondaryFontSize,
-        fontWeight: FontWeight.bold,
-        color: whiteText,
-      );
+    fontSize: secondaryFontSize,
+    fontWeight: FontWeight.bold,
+    color: whiteText,
+  );
 
   static TextStyle get priceText => TextStyle(
-        fontSize: bodyFontSize,
-        fontWeight: FontWeight.bold,
-        color: primaryText,
-      );
+    fontSize: bodyFontSize,
+    fontWeight: FontWeight.bold,
+    color: primaryText,
+  );
 
   static TextStyle get percentageChangePositive => TextStyle(
-        fontSize: secondaryFontSize,
-        fontWeight: FontWeight.normal,
-        color: successGreen,
-      );
+    fontSize: secondaryFontSize,
+    fontWeight: FontWeight.normal,
+    color: successGreen,
+  );
 
   static TextStyle get percentageChangeNegative => TextStyle(
-        fontSize: secondaryFontSize,
-        fontWeight: FontWeight.normal,
-        color: warningRed,
-      );
+    fontSize: secondaryFontSize,
+    fontWeight: FontWeight.normal,
+    color: warningRed,
+  );
 
   // ==================== BOX DECORATIONS ====================
 
-  static BoxDecoration get headerDecoration => BoxDecoration(
-        gradient: brandGradient,
-      );
+  static BoxDecoration get headerDecoration =>
+      BoxDecoration(gradient: brandGradient);
 
   static BoxDecoration get activeTabDecoration => BoxDecoration(
-        color: activeTabColor,
-        borderRadius: BorderRadius.circular(tabBorderRadius),
-      );
+    color: activeTabColor,
+    borderRadius: BorderRadius.circular(tabBorderRadius),
+  );
 
   static BoxDecoration get buyButtonDecoration => BoxDecoration(
-        color: buyButtonColor,
-        borderRadius: BorderRadius.circular(buttonBorderRadius),
-        boxShadow: [
-          BoxShadow(
-            color: buyButtonColor.withValues(alpha: 0.3),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      );
+    color: buyButtonColor,
+    borderRadius: BorderRadius.circular(buttonBorderRadius),
+    boxShadow: [
+      BoxShadow(
+        color: buyButtonColor.withValues(alpha: 0.3),
+        blurRadius: 4,
+        offset: const Offset(0, 2),
+      ),
+    ],
+  );
 
   static BoxDecoration get sellButtonDecoration => BoxDecoration(
-        color: sellButtonColor,
-        borderRadius: BorderRadius.circular(buttonBorderRadius),
-        boxShadow: [
-          BoxShadow(
-            color: sellButtonColor.withValues(alpha: 0.3),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      );
+    color: sellButtonColor,
+    borderRadius: BorderRadius.circular(buttonBorderRadius),
+    boxShadow: [
+      BoxShadow(
+        color: sellButtonColor.withValues(alpha: 0.3),
+        blurRadius: 4,
+        offset: const Offset(0, 2),
+      ),
+    ],
+  );
 
   static BoxDecoration get searchBarDecoration => BoxDecoration(
-        color: secondaryBackground,
-        borderRadius: BorderRadius.circular(searchBarBorderRadius),
-      );
+    color: secondaryBackground,
+    borderRadius: BorderRadius.circular(searchBarBorderRadius),
+  );
 
   static BoxDecoration get listItemDecoration => BoxDecoration(
-        color: primaryBackground,
-        border: Border(
-          bottom: BorderSide(color: lightBorder, width: 1),
-        ),
-      );
+    color: primaryBackground,
+    border: Border(bottom: BorderSide(color: lightBorder, width: 1)),
+  );
 
   static BoxDecoration get notificationBadgeDecoration => BoxDecoration(
-        gradient: notificationBadgeGradient,
-        shape: BoxShape.circle,
-      );
+    gradient: notificationBadgeGradient,
+    shape: BoxShape.circle,
+  );
+
+  static BoxDecoration get fabDecoration => BoxDecoration(
+    gradient: fabGradient,
+    shape: BoxShape.circle,
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: fabShadowOpacity),
+        blurRadius: fabShadowBlur,
+        offset: Offset(0, fabShadowOffset),
+      ),
+    ],
+  );
 
   // ==================== ORIENTATION HELPERS ====================
 
@@ -295,14 +341,14 @@ class AppUiConstants {
   static int calculateGridColumns(double availableWidth) {
     // Calculate max columns based on minimum card width
     final maxColumns = (availableWidth / gridMinCardWidth).floor();
-    
+
     // Calculate min columns based on maximum card width
     final minColumns = (availableWidth / gridMaxCardWidth).ceil();
-    
+
     // Use the larger of the two to ensure optimal card sizing
     // If minColumns > maxColumns, it means we can fit fewer columns with max card width
     final optimalColumns = maxColumns > minColumns ? maxColumns : minColumns;
-    
+
     // Ensure at least 1 column and at most 4 columns
     return optimalColumns.clamp(1, 4);
   }

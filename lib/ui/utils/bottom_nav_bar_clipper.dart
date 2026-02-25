@@ -23,14 +23,13 @@ class BottomNavBarClipper extends CustomClipper<Path> {
 
     final Path path = Path()
       ..moveTo(0, 0) // Start at the top-left corner
-      ..lineTo(width * 0.5 - cutoutWidth / 2,
-          0) // Move to the left edge of the cutout
+      ..lineTo(width * 0.5 - cutoutWidth / 2, 0) // Move to the left edge of the cutout
 
       // Create the top-left smooth rounded corner using quadraticBezier
       ..quadraticBezierTo(
-        width * 0.5 - cutoutWidth / 2 + 20,
+        width * 0.5 - cutoutWidth / 2 + cutoutRadius * 0.5,
         0, // Control point
-        width * 0.5 - cutoutWidth / 2 + 40,
+        width * 0.5 - cutoutWidth / 2 + cutoutRadius,
         cutoutDepth,
       ) // Endpoint of the curve
 
@@ -38,13 +37,13 @@ class BottomNavBarClipper extends CustomClipper<Path> {
       ..quadraticBezierTo(
         width * 0.5,
         cutoutDepth + cutoutRadius, // Control point
-        width * 0.5 + cutoutWidth / 2 - 40,
+        width * 0.5 + cutoutWidth / 2 - cutoutRadius,
         cutoutDepth,
       ) // Endpoint of the center curve
 
       // Create the top-right smooth rounded corner using quadraticBezier
       ..quadraticBezierTo(
-        width * 0.5 + cutoutWidth / 2 - 20,
+        width * 0.5 + cutoutWidth / 2 - cutoutRadius * 0.5,
         0, // Control point
         width * 0.5 + cutoutWidth / 2,
         0,

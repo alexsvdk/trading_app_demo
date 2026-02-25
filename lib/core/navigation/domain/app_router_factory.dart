@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../features/features.barrel.dart';
 import '../models/app_routes.dart';
-import '../../../features/main/presentation/main_screen.dart';
-import '../../../features/market_watch/presentation/market_watch_screen.dart';
-import '../../../features/portfolio/presentation/portfolio_screen.dart';
-import '../../../features/orders/presentation/orders_screen.dart';
-import '../../../features/positions/presentation/positions_screen.dart';
 
 /// Factory class to create and configure the GoRouter
 @singleton
@@ -26,35 +22,35 @@ class AppRouterFactory {
             return MainScreen(navigationShell: navigationShell);
           },
           branches: [
-            // Market Watch (Home)
+            // My Favorites (Market Watch)
             StatefulShellBranch(
               routes: [
                 GoRoute(
-                  path: AppRoutes.marketWatch.path,
-                  name: AppRoutes.marketWatch.name,
-                  builder: (context, state) => const MarketWatchScreen(),
+                  path: AppRoutes.favorites.path,
+                  name: AppRoutes.favorites.name,
+                  builder: (context, state) => const FavoritesScreen(),
                 ),
               ],
             ),
 
-            // Portfolio
-            StatefulShellBranch(
-              routes: [
-                GoRoute(
-                  path: AppRoutes.portfolio.path,
-                  name: AppRoutes.portfolio.name,
-                  builder: (context, state) => const PortfolioScreen(),
-                ),
-              ],
-            ),
-
-            // Orders
+            // Order
             StatefulShellBranch(
               routes: [
                 GoRoute(
                   path: AppRoutes.orders.path,
                   name: AppRoutes.orders.name,
                   builder: (context, state) => const OrdersScreen(),
+                ),
+              ],
+            ),
+
+            // Watchlist (Center item - opens Market Watch)
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.marketWatch.path,
+                  name: AppRoutes.marketWatch.name,
+                  builder: (context, state) => const MarketWatchScreen(),
                 ),
               ],
             ),
@@ -66,6 +62,17 @@ class AppRouterFactory {
                   path: AppRoutes.positions.path,
                   name: AppRoutes.positions.name,
                   builder: (context, state) => const PositionsScreen(),
+                ),
+              ],
+            ),
+
+            // Wallet (Portfolio)
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: AppRoutes.portfolio.path,
+                  name: AppRoutes.portfolio.name,
+                  builder: (context, state) => const PortfolioScreen(),
                 ),
               ],
             ),

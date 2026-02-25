@@ -1,4 +1,4 @@
-.PHONY: gen slang
+.PHONY: gen slang golden
 
 # Generate code
 gen:
@@ -9,3 +9,7 @@ slang:
 	fvm dart run slang
 	fvm dart run slang configure
 	fvm dart run slang normalize
+
+# Update golden tests
+golden:
+	fvm flutter test --update-goldens

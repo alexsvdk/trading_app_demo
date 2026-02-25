@@ -1,6 +1,7 @@
 enum AppRoutes {
   // Main Navigation
   marketWatch(path: '/'),
+  favorites(path: '/favorites'),
   portfolio(path: '/portfolio'),
   orders(path: '/orders'),
   positions(path: '/positions');

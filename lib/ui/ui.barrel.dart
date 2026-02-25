@@ -2,4 +2,5 @@
 
 // Barrel files
 export 'utils/utils.barrel.dart';
+export 'components/components.barrel.dart';
 export 'theme/theme.barrel.dart';
