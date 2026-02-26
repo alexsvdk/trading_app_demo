@@ -25,7 +25,7 @@ class MenuButton extends StatelessWidget {
           padding: const EdgeInsets.all(AppUiConstants.smallSpacing),
           child: Icon(
             Icons.menu,
-            color: AppUiConstants.whiteText,
+            color: AppUiConstants.headerContentColor,
             size: iconSize,
           ),
         ),

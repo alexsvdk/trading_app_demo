@@ -30,7 +30,7 @@ class NotificationWidget extends StatelessWidget {
             children: [
               Icon(
                 Icons.notifications,
-                color: AppUiConstants.whiteText,
+                color: AppUiConstants.headerContentColor,
                 size: iconSize,
               ),
               if (count > 0)

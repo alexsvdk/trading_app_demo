@@ -45,21 +45,24 @@ class WalletWidget extends StatelessWidget {
             vertical: AppUiConstants.smallSpacing,
           ),
           child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ShaderMask(
                 shaderCallback: (bounds) => AppUiConstants.brandGradient.createShader(bounds),
+                blendMode: BlendMode.srcATop,
                 child: SvgPicture.asset(
                   Assets.images.navbar.wallet,
-                  colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                 ),
               ),
               const SizedBox(width: 2),
-              Text(
-                balance,
-                style: AppUiConstants.mediumHeading.copyWith(
-                  fontSize: balanceFontSize,
+              ShaderMask(
+                shaderCallback: (bounds) => AppUiConstants.secondaryGradient.createShader(bounds),
+                child: Text(
+                  balance,
+                  style: AppUiConstants.mediumHeading.copyWith(
+                    fontSize: balanceFontSize,
+                    color: AppUiConstants.headerContentColor,
+                  ),
                 ),
               ),
             ],

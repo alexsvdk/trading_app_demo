@@ -38,6 +38,8 @@ class AppUiConstants {
   static const Color secondaryText = Color(0xFF666666); // Medium gray
   static const Color tertiaryText = Color(0xFF888888); // Light gray
   static const Color whiteText = Color(0xFFFFFFFF); // White
+  // Header content color (used on light header backgrounds)
+  static const Color headerContentColor = primaryText;
 
   // Background Colors
   static const Color primaryBackground = Color(0xFFFFFFFF); // White
@@ -251,8 +253,19 @@ class AppUiConstants {
 
   // ==================== BOX DECORATIONS ====================
 
+  // Lightened header gradient: 60% white + 40% brand colors
+  static LinearGradient get headerLightGradient => LinearGradient(
+    begin: Alignment.centerLeft,
+    end: Alignment.centerRight,
+    colors: [
+      Color.lerp(Colors.white, brandGradientStart, 0.4)!,
+      Color.lerp(Colors.white, brandGradientMiddle, 0.4)!,
+      Color.lerp(Colors.white, brandGradientEnd, 0.4)!,
+    ],
+  );
+
   static BoxDecoration get headerDecoration =>
-      BoxDecoration(gradient: brandGradient);
+      BoxDecoration(gradient: headerLightGradient);
 
   static BoxDecoration get activeTabDecoration => BoxDecoration(
     color: activeTabColor,

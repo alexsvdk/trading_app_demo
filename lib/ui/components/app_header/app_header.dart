@@ -49,7 +49,7 @@ class AppHeader extends StatelessWidget {
             child: Text(
               'Market Watch',
               style: AppUiConstants.mediumHeading.copyWith(
-                color: AppUiConstants.whiteText,
+                color: AppUiConstants.headerContentColor,
                 fontSize: titleFontSize,
               ),
             ),

@@ -5,9 +5,14 @@ import 'package:go_router/go_router.dart';
 import '../../../ui/components/components.barrel.dart';
 import '../../../ui/theme/app_ui_constants.dart';
 import '../../../core/di/injection_container.dart';
+import 'bloc/market_watch_bloc.dart';
+import 'bloc/market_watch_event.dart';
+import 'bloc/market_watch_state.dart';
 import '../../wallet/presentation/bloc/wallet_bloc.dart';
 import '../../wallet/presentation/bloc/wallet_event.dart';
 import '../../wallet/presentation/bloc/wallet_state.dart';
+import '../../../core/services/price_formatter.dart';
+import '../domain/entities/market_price_entity.dart';
 
 /// Market Watch Screen - Home screen showing trading contracts
 class MarketWatchScreen extends StatelessWidget {
@@ -17,48 +22,56 @@ class MarketWatchScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (context) => getIt<WalletBloc>()..add(WalletStarted()),
-      child: Scaffold(
-        body: OrientationBuilder(
-          builder: (context, orientation) {
-            final isLandscape = orientation == Orientation.landscape;
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (context) =>
+                getIt<MarketWatchBloc>()..add(const MarketWatchStarted()),
+          ),
+        ],
+        child: Scaffold(
+          body: OrientationBuilder(
+            builder: (context, orientation) {
+              final isLandscape = orientation == Orientation.landscape;
 
-            return CustomScrollView(
-              slivers: [
-                // Header
-                SliverToBoxAdapter(child: _buildHeader(context, isLandscape)),
+              return CustomScrollView(
+                slivers: [
+                  // Header
+                  SliverToBoxAdapter(child: _buildHeader(context, isLandscape)),
 
-                // Market Category Tabs
-                SliverToBoxAdapter(
-                  child: _buildMarketTabs(context, isLandscape),
-                ),
-
-                // Search Bar
-                SliverToBoxAdapter(
-                  child: _buildSearchBar(context, isLandscape),
-                ),
-
-                // Section Header
-                SliverToBoxAdapter(child: _buildSectionHeader(context)),
-
-                // Contract List (Grid in landscape, List in portrait)
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppUiConstants.screenPadding,
-                    vertical: AppUiConstants.smallSpacing,
+                  // Market Category Tabs
+                  SliverToBoxAdapter(
+                    child: _buildMarketTabs(context, isLandscape),
                   ),
-                  sliver:
-                      isLandscape &&
-                          AppUiConstants.calculateGridColumns(
-                                MediaQuery.widthOf(context) -
-                                    2 * AppUiConstants.screenPadding,
-                              ) >
-                              1
-                      ? _buildContractGrid(context)
-                      : _buildContractList(context),
-                ),
-              ],
-            );
-          },
+
+                  // Search Bar
+                  SliverToBoxAdapter(
+                    child: _buildSearchBar(context, isLandscape),
+                  ),
+
+                  // Section Header
+                  SliverToBoxAdapter(child: _buildSectionHeader(context)),
+
+                  // Contract List (Grid in landscape, List in portrait)
+                  SliverPadding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppUiConstants.screenPadding,
+                      vertical: AppUiConstants.smallSpacing,
+                    ),
+                    sliver:
+                        isLandscape &&
+                            AppUiConstants.calculateGridColumns(
+                                  MediaQuery.widthOf(context) -
+                                      2 * AppUiConstants.screenPadding,
+                                ) >
+                                1
+                        ? _buildContractGrid(context)
+                        : _buildContractList(context),
+                  ),
+                ],
+              );
+            },
+          ),
         ),
       ),
     );
@@ -219,29 +232,94 @@ class MarketWatchScreen extends StatelessWidget {
   }
 
   Widget _buildContractList(BuildContext context) {
-    return SliverList(
-      delegate: SliverChildBuilderDelegate(
-        (context, index) => _buildContractListItem(context, index),
-        childCount: 10, // Example: 10 contracts
-      ),
+    return BlocBuilder<MarketWatchBloc, MarketWatchState>(
+      builder: (context, state) {
+        if (state is MarketWatchLoaded) {
+          return SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) =>
+                  _buildContractListItem(context, state.prices[index]),
+              childCount: state.prices.length,
+            ),
+          );
+        }
+
+        if (state is MarketWatchFailure) {
+          return SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppUiConstants.screenPadding,
+                vertical: AppUiConstants.smallSpacing,
+              ),
+              child: Text(state.message, style: AppUiConstants.smallText),
+            ),
+          );
+        }
+
+        return const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppUiConstants.screenPadding,
+              vertical: AppUiConstants.smallSpacing,
+            ),
+            child: Center(child: CircularProgressIndicator()),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildContractGrid(BuildContext context) {
-    return SliverToBoxAdapter(
-      child: SizedBox(
-        height: 400, // Fixed height for demo
-        child: ResponsiveGrid(
-          children: List.generate(
-            10,
-            (index) => _buildContractCard(context, index),
+    return BlocBuilder<MarketWatchBloc, MarketWatchState>(
+      builder: (context, state) {
+        if (state is MarketWatchLoaded) {
+          return SliverToBoxAdapter(
+            child: SizedBox(
+              height: 400, // Fixed height for demo
+              child: ResponsiveGrid(
+                children: List.generate(
+                  state.prices.length,
+                  (index) => _buildContractCard(context, state.prices[index]),
+                ),
+              ),
+            ),
+          );
+        }
+
+        if (state is MarketWatchFailure) {
+          return SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppUiConstants.screenPadding,
+                vertical: AppUiConstants.smallSpacing,
+              ),
+              child: Text(state.message, style: AppUiConstants.smallText),
+            ),
+          );
+        }
+
+        return const SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppUiConstants.screenPadding,
+              vertical: AppUiConstants.smallSpacing,
+            ),
+            child: Center(child: CircularProgressIndicator()),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildContractListItem(BuildContext context, int index) {
+  Widget _buildContractListItem(
+    BuildContext context,
+    MarketPriceEntity price,
+  ) {
+    final formatter = getIt<PriceFormatter>();
+    final changeStyle = price.isPositive
+        ? AppUiConstants.percentageChangePositive
+        : AppUiConstants.percentageChangeNegative;
+
     return Container(
       height: AppUiConstants.listItemHeight,
       decoration: AppUiConstants.listItemDecoration,
@@ -259,13 +337,15 @@ class MarketWatchScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'NIFTY FUT',
+                  price.contract.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: AppUiConstants.bodyText.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text('25 JAN', style: AppUiConstants.smallText),
+                Text(price.contract.expiry, style: AppUiConstants.smallText),
               ],
             ),
           ),
@@ -277,15 +357,13 @@ class MarketWatchScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  (20000 + index * 100).toStringAsFixed(2),
+                  formatter.formatPrice(price.price),
                   style: AppUiConstants.priceText,
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${index % 2 == 0 ? '+' : '-'}${(1.0 + index * 0.5).toStringAsFixed(2)}%',
-                  style: index % 2 == 0
-                      ? AppUiConstants.percentageChangePositive
-                      : AppUiConstants.percentageChangeNegative,
+                  formatter.formatPercentage(price.percentChange),
+                  style: changeStyle,
                 ),
               ],
             ),
@@ -307,7 +385,15 @@ class MarketWatchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContractCard(BuildContext context, int index) {
+  Widget _buildContractCard(
+    BuildContext context,
+    MarketPriceEntity price,
+  ) {
+    final formatter = getIt<PriceFormatter>();
+    final changeStyle = price.isPositive
+        ? AppUiConstants.percentageChangePositive
+        : AppUiConstants.percentageChangeNegative;
+
     return Container(
       decoration: BoxDecoration(
         color: AppUiConstants.primaryBackground,
@@ -327,13 +413,15 @@ class MarketWatchScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'NIFTY FUT',
+                    price.contract.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                     style: AppUiConstants.bodyText.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text('25 JAN', style: AppUiConstants.smallText),
+                  Text(price.contract.expiry, style: AppUiConstants.smallText),
                 ],
               ),
               Icon(
@@ -351,15 +439,13 @@ class MarketWatchScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    (20000 + index * 100).toStringAsFixed(2),
+                    formatter.formatPrice(price.price),
                     style: AppUiConstants.priceText,
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    '${index % 2 == 0 ? '+' : '-'}${(1.0 + index * 0.5).toStringAsFixed(2)}%',
-                    style: index % 2 == 0
-                        ? AppUiConstants.percentageChangePositive
-                        : AppUiConstants.percentageChangeNegative,
+                    formatter.formatPercentage(price.percentChange),
+                    style: changeStyle,
                   ),
                 ],
               ),
