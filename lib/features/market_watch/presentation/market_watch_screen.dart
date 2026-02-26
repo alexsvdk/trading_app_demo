@@ -8,6 +8,7 @@ import '../../../core/di/injection_container.dart';
 import 'bloc/market_watch_bloc.dart';
 import 'bloc/market_watch_event.dart';
 import 'bloc/market_watch_state.dart';
+import 'models/market_watch_tabs.dart';
 import '../../wallet/presentation/bloc/wallet_bloc.dart';
 import '../../wallet/presentation/bloc/wallet_event.dart';
 import '../../wallet/presentation/bloc/wallet_state.dart';
@@ -40,9 +41,10 @@ class MarketWatchScreen extends StatelessWidget {
                   SliverToBoxAdapter(child: _buildHeader(context, isLandscape)),
 
                   // Market Category Tabs
-                  SliverToBoxAdapter(
-                    child: _buildMarketTabs(context, isLandscape),
-                  ),
+                  SliverToBoxAdapter(child: _buildMarketTabs(context)),
+
+                  // Market Segmented Control
+                  SliverToBoxAdapter(child: _buildMarketSegments(context)),
 
                   // Search Bar
                   SliverToBoxAdapter(
@@ -57,7 +59,7 @@ class MarketWatchScreen extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppUiConstants.screenPadding,
                       vertical: AppUiConstants.smallSpacing,
-                    ),
+                    ).copyWith(bottom: 90),
                     sliver:
                         isLandscape &&
                             AppUiConstants.calculateGridColumns(
@@ -103,87 +105,51 @@ class MarketWatchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMarketTabs(BuildContext context, bool isLandscape) {
-    final tabBarHeight = AppUiConstants.getTabBarHeight(isLandscape);
+  Widget _buildMarketTabs(BuildContext context) {
+    return BlocBuilder<MarketWatchBloc, MarketWatchState>(
+      builder: (context, state) {
+        if (state is! MarketWatchLoaded) {
+          return const SizedBox.shrink();
+        }
 
-    return Container(
-      height: tabBarHeight,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppUiConstants.screenPadding,
-        vertical: AppUiConstants.smallSpacing,
-      ),
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: [
-          _buildTab(
-            context,
-            'Indian Market',
-            'assets/images/tabs/indian_market.png',
-            true,
+        return MarketCategoryTabBar(
+          selectedCategory: state.category,
+          onSelected: (category) => context.read<MarketWatchBloc>().add(
+            MarketWatchCategorySelected(category),
           ),
-          _buildTab(
-            context,
-            'International',
-            'assets/images/tabs/International.png',
-            false,
-          ),
-          _buildTab(
-            context,
-            'Forex Futures',
-            'assets/images/tabs/forex.png',
-            false,
-          ),
-          _buildTab(
-            context,
-            'Crypto Futures',
-            'assets/images/tabs/crypto.png',
-            false,
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildTab(
-    BuildContext context,
-    String label,
-    String assetPath,
-    bool isActive,
-  ) {
-    return Container(
-      margin: const EdgeInsets.only(right: AppUiConstants.elementSpacing),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppUiConstants.mediumSpacing,
-        vertical: AppUiConstants.smallSpacing,
-      ),
-      decoration: isActive ? AppUiConstants.activeTabDecoration : null,
-      child: Row(
-        children: [
-          Image.asset(
-            assetPath,
-            width: AppUiConstants.tabIconSize,
-            height: AppUiConstants.tabIconSize,
-            color: isActive
-                ? AppUiConstants.whiteText
-                : AppUiConstants.inactiveColor,
+  Widget _buildMarketSegments(BuildContext context) {
+    return BlocBuilder<MarketWatchBloc, MarketWatchState>(
+      builder: (context, state) {
+        if (state is! MarketWatchLoaded) {
+          return const SizedBox.shrink();
+        }
+
+        return MarketSegmentedControl(
+          selectedSegment: state.segment,
+          onSelected: (segment) => context.read<MarketWatchBloc>().add(
+            MarketWatchSegmentSelected(segment),
           ),
-          const SizedBox(width: AppUiConstants.smallSpacing),
-          Text(
-            label,
-            style: AppUiConstants.secondaryTextStyle.copyWith(
-              color: isActive
-                  ? AppUiConstants.whiteText
-                  : AppUiConstants.inactiveColor,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            ),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
   Widget _buildSearchBar(BuildContext context, bool isLandscape) {
     final searchBarHeight = AppUiConstants.getSearchBarHeight(isLandscape);
+
+    final searchHint = context.select<MarketWatchBloc, String>((bloc) {
+      final state = bloc.state;
+      if (state is MarketWatchLoaded) {
+        return state.segment.searchHint;
+      }
+
+      return 'Search Nse Futures';
+    });
 
     return Container(
       height: searchBarHeight,
@@ -206,7 +172,7 @@ class MarketWatchScreen extends StatelessWidget {
           Expanded(
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Search Nse Futures',
+                hintText: searchHint,
                 hintStyle: AppUiConstants.secondaryTextStyle.copyWith(
                   color: AppUiConstants.inactiveColor,
                 ),
@@ -222,12 +188,21 @@ class MarketWatchScreen extends StatelessWidget {
   }
 
   Widget _buildSectionHeader(BuildContext context) {
+    final title = context.select<MarketWatchBloc, String>((bloc) {
+      final state = bloc.state;
+      if (state is MarketWatchLoaded) {
+        return state.segment.label;
+      }
+
+      return 'NSE Futures';
+    });
+
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppUiConstants.screenPadding,
         vertical: AppUiConstants.smallSpacing,
       ),
-      child: Text('NSE Futures', style: AppUiConstants.mediumHeading),
+      child: Text(title, style: AppUiConstants.mediumHeading),
     );
   }
 
@@ -311,10 +286,7 @@ class MarketWatchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContractListItem(
-    BuildContext context,
-    MarketPriceEntity price,
-  ) {
+  Widget _buildContractListItem(BuildContext context, MarketPriceEntity price) {
     final formatter = getIt<PriceFormatter>();
     final changeStyle = price.isPositive
         ? AppUiConstants.percentageChangePositive
@@ -385,10 +357,7 @@ class MarketWatchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContractCard(
-    BuildContext context,
-    MarketPriceEntity price,
-  ) {
+  Widget _buildContractCard(BuildContext context, MarketPriceEntity price) {
     final formatter = getIt<PriceFormatter>();
     final changeStyle = price.isPositive
         ? AppUiConstants.percentageChangePositive

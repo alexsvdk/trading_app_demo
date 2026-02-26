@@ -3,6 +3,7 @@
 // Other files
 export 'responsive_grid.dart';
 export 'bottom_nav_bar.dart';
+export 'market_tabs/market_tabs.dart';
 
 // App header
 export 'app_header/app_header.dart';

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/usecases/watch_market_prices_usecase.dart';
 import 'market_watch_event.dart';
 import 'market_watch_state.dart';
+import '../models/market_watch_tabs.dart';
 
 class MarketWatchBloc extends Bloc<MarketWatchEvent, MarketWatchState> {
   final WatchMarketPricesUseCase watchMarketPricesUseCase;
@@ -15,6 +16,8 @@ class MarketWatchBloc extends Bloc<MarketWatchEvent, MarketWatchState> {
     on<MarketWatchStarted>(_onStarted);
     on<MarketWatchPricesUpdated>(_onPricesUpdated);
     on<MarketWatchFailed>(_onFailed);
+    on<MarketWatchCategorySelected>(_onCategorySelected);
+    on<MarketWatchSegmentSelected>(_onSegmentSelected);
   }
 
   Future<void> _onStarted(
@@ -34,7 +37,21 @@ class MarketWatchBloc extends Bloc<MarketWatchEvent, MarketWatchState> {
     MarketWatchPricesUpdated event,
     Emitter<MarketWatchState> emit,
   ) {
-    emit(MarketWatchLoaded(event.prices));
+    final current = state;
+    final category = current is MarketWatchLoaded
+        ? current.category
+        : MarketCategory.indian;
+    final segment = current is MarketWatchLoaded
+        ? current.segment
+        : MarketSegment.nseFutures;
+
+    emit(
+      MarketWatchLoaded(
+        event.prices,
+        category: category,
+        segment: segment,
+      ),
+    );
   }
 
   void _onFailed(
@@ -42,6 +59,26 @@ class MarketWatchBloc extends Bloc<MarketWatchEvent, MarketWatchState> {
     Emitter<MarketWatchState> emit,
   ) {
     emit(MarketWatchFailure(event.message));
+  }
+
+  void _onCategorySelected(
+    MarketWatchCategorySelected event,
+    Emitter<MarketWatchState> emit,
+  ) {
+    final current = state;
+    if (current is MarketWatchLoaded) {
+      emit(current.copyWith(category: event.category));
+    }
+  }
+
+  void _onSegmentSelected(
+    MarketWatchSegmentSelected event,
+    Emitter<MarketWatchState> emit,
+  ) {
+    final current = state;
+    if (current is MarketWatchLoaded) {
+      emit(current.copyWith(segment: event.segment));
+    }
   }
 
   @override

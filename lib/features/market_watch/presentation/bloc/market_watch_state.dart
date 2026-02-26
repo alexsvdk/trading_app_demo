@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../domain/entities/market_price_entity.dart';
+import '../models/market_watch_tabs.dart';
 
 abstract class MarketWatchState extends Equatable {
   const MarketWatchState();
@@ -19,11 +20,29 @@ class MarketWatchLoading extends MarketWatchState {
 
 class MarketWatchLoaded extends MarketWatchState {
   final List<MarketPriceEntity> prices;
+  final MarketCategory category;
+  final MarketSegment segment;
 
-  const MarketWatchLoaded(this.prices);
+  const MarketWatchLoaded(
+    this.prices, {
+    required this.category,
+    required this.segment,
+  });
+
+  MarketWatchLoaded copyWith({
+    List<MarketPriceEntity>? prices,
+    MarketCategory? category,
+    MarketSegment? segment,
+  }) {
+    return MarketWatchLoaded(
+      prices ?? this.prices,
+      category: category ?? this.category,
+      segment: segment ?? this.segment,
+    );
+  }
 
   @override
-  List<Object?> get props => [prices];
+  List<Object?> get props => [prices, category, segment];
 }
 
 class MarketWatchFailure extends MarketWatchState {

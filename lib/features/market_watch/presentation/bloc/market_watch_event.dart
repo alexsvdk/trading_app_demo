@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../domain/entities/market_price_entity.dart';
+import '../models/market_watch_tabs.dart';
 
 abstract class MarketWatchEvent extends Equatable {
   const MarketWatchEvent();
@@ -29,4 +30,22 @@ class MarketWatchFailed extends MarketWatchEvent {
 
   @override
   List<Object?> get props => [message];
+}
+
+class MarketWatchCategorySelected extends MarketWatchEvent {
+  final MarketCategory category;
+
+  const MarketWatchCategorySelected(this.category);
+
+  @override
+  List<Object?> get props => [category];
+}
+
+class MarketWatchSegmentSelected extends MarketWatchEvent {
+  final MarketSegment segment;
+
+  const MarketWatchSegmentSelected(this.segment);
+
+  @override
+  List<Object?> get props => [segment];
 }

@@ -52,6 +52,11 @@ class AppUiConstants {
 
   // Inactive Colors
   static const Color inactiveColor = Color(0xFF9E9E9E); // Gray
+  static const Color tabBarDivider = Color(0xFFE6E6E6); // Light divider
+  static const Color segmentedBackground = Color(0xFFF8F7FB); // Light lavender
+  static const Color segmentedInactiveText = Color(0xFF777777); // Medium gray
+  static const Color segmentedActiveText = Color(0xFFFFFFFF); // White
+  static const Color activeTabUnderline = Color(0xFF222222); // Near-black
 
   // ==================== SIZES ====================
 
@@ -61,7 +66,18 @@ class AppUiConstants {
 
   // Portrait Dimensions
   static const double headerHeight = 90.0;
-  static const double tabBarHeight = 50.0;
+  static const double tabBarHeight = 80.0;
+  static const double tabBarTopPadding = 10.0;
+  static const double tabBarBottomPadding = 6.0;
+  static const double tabBarItemWidth = 80.0;
+  static const double tabBarIconSize = 50.0;
+  static const double tabBarUnderlineHeight = 4.0;
+  static const double tabBarUnderlineWidth = 56.0;
+  static const double segmentedBarHeight = 56.0;
+  static const double tabBarLabelFontSize = 10.0;
+  static const double tabBarActiveIconScale = 1.4;
+  static const Duration tabBarIconAnimDuration = Duration(milliseconds: 220);
+  static const Curve tabBarIconAnimCurve = Curves.easeOutCubic;
   static const double searchBarHeight = 40.0;
   static const double listItemHeight = 80.0;
   static const double bottomNavHeight = 70.0;
@@ -144,6 +160,7 @@ class AppUiConstants {
   static const double buttonBorderRadius = 8.0;
   static const double searchBarBorderRadius = 10.0;
   static const double tabBorderRadius = 20.0;
+  static const double segmentedBorderRadius = 12.0;
   static const double cardBorderRadius = 12.0;
   static const double notificationBadgeRadius = 10.0;
 
@@ -215,6 +232,34 @@ class AppUiConstants {
     color: AppUiConstants.secondaryText,
   );
 
+  static TextStyle get tabBarActiveLabel => TextStyle(
+    fontSize: tabBarLabelFontSize,
+    fontWeight: FontWeight.w700,
+    color: primaryText,
+    letterSpacing: 0.1,
+  );
+
+  static TextStyle get tabBarInactiveLabel => TextStyle(
+    fontSize: tabBarLabelFontSize,
+    fontWeight: FontWeight.w500,
+    color: secondaryText,
+    letterSpacing: 0.1,
+  );
+
+  static TextStyle get segmentedActiveLabel => TextStyle(
+    fontSize: secondaryFontSize,
+    fontWeight: FontWeight.w700,
+    color: segmentedActiveText,
+    letterSpacing: 0.4,
+  );
+
+  static TextStyle get segmentedInactiveLabel => TextStyle(
+    fontSize: secondaryFontSize,
+    fontWeight: FontWeight.w600,
+    color: segmentedInactiveText,
+    letterSpacing: 0.4,
+  );
+
   static TextStyle get smallText => TextStyle(
     fontSize: smallFontSize,
     fontWeight: FontWeight.normal,
@@ -270,6 +315,20 @@ class AppUiConstants {
   static BoxDecoration get activeTabDecoration => BoxDecoration(
     color: activeTabColor,
     borderRadius: BorderRadius.circular(tabBorderRadius),
+  );
+
+  static BoxDecoration get segmentedActiveDecoration => BoxDecoration(
+    gradient: const LinearGradient(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+      colors: [Color(0xFF4D7BFF), Color(0xFFB06BEA)],
+    ),
+    borderRadius: BorderRadius.circular(segmentedBorderRadius),
+  );
+
+  static BoxDecoration get segmentedContainerDecoration => BoxDecoration(
+    color: segmentedBackground,
+    borderRadius: BorderRadius.circular(segmentedBorderRadius),
   );
 
   static BoxDecoration get buyButtonDecoration => BoxDecoration(

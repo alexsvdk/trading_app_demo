@@ -8,6 +8,7 @@ import 'package:trading_app_demo/features/market_watch/domain/usecases/watch_mar
 import 'package:trading_app_demo/features/market_watch/presentation/bloc/market_watch_bloc.dart';
 import 'package:trading_app_demo/features/market_watch/presentation/bloc/market_watch_event.dart';
 import 'package:trading_app_demo/features/market_watch/presentation/bloc/market_watch_state.dart';
+import 'package:trading_app_demo/features/market_watch/presentation/models/market_watch_tabs.dart';
 
 class MockWatchMarketPricesUseCase extends Mock
     implements WatchMarketPricesUseCase {}
@@ -51,7 +52,11 @@ void main() {
   test('emits loading then loaded when prices arrive', () async {
     final expected = [
       const MarketWatchLoading(),
-      MarketWatchLoaded(prices),
+      MarketWatchLoaded(
+        prices,
+        category: MarketCategory.indian,
+        segment: MarketSegment.nseFutures,
+      ),
     ];
 
     expectLater(bloc.stream, emitsInOrder(expected));
@@ -72,5 +77,44 @@ void main() {
     bloc.add(const MarketWatchStarted());
     await Future.delayed(Duration.zero);
     controller.addError(Exception('boom'));
+  });
+
+  test('updates selected category on event', () async {
+    final expected = [
+      const MarketWatchLoading(),
+      isA<MarketWatchLoaded>(),
+      isA<MarketWatchLoaded>()
+          .having((state) => state.category, 'category', MarketCategory.crypto),
+    ];
+
+    expectLater(bloc.stream, emitsInOrder(expected));
+
+    bloc.add(const MarketWatchStarted());
+    await Future.delayed(Duration.zero);
+    controller.add(prices);
+    await Future.delayed(Duration.zero);
+
+    bloc.add(MarketWatchCategorySelected(MarketCategory.crypto));
+  });
+
+  test('updates selected segment on event', () async {
+    final expected = [
+      const MarketWatchLoading(),
+      isA<MarketWatchLoaded>(),
+      isA<MarketWatchLoaded>().having(
+        (state) => state.segment,
+        'segment',
+        MarketSegment.mcxOptions,
+      ),
+    ];
+
+    expectLater(bloc.stream, emitsInOrder(expected));
+
+    bloc.add(const MarketWatchStarted());
+    await Future.delayed(Duration.zero);
+    controller.add(prices);
+    await Future.delayed(Duration.zero);
+
+    bloc.add(MarketWatchSegmentSelected(MarketSegment.mcxOptions));
   });
 }
