@@ -20,8 +20,6 @@ class WalletWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final balanceFontSize = isLandscape ? 14.0 : 16.0;
-    final labelFontSize = isLandscape ? 10.0 : 12.0;
-    final verticalPadding = isLandscape ? 4.0 : AppUiConstants.smallSpacing;
 
     return Container(
       decoration: BoxDecoration(
@@ -42,9 +40,9 @@ class WalletWidget extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppUiConstants.buttonBorderRadius),
         child: Padding(
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: AppUiConstants.smallSpacing,
-            vertical: verticalPadding,
+            vertical: AppUiConstants.smallSpacing,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -64,11 +62,11 @@ class WalletWidget extends StatelessWidget {
                   Text(
                     'Balance',
                     style: AppUiConstants.secondaryTextStyle.copyWith(
-                      fontSize: labelFontSize,
+                      fontSize: 12.0,
                       color: AppUiConstants.headerContentColor,
                     ),
                   ),
-                  SizedBox(height: isLandscape ? 0.0 : 2.0),
+                  const SizedBox(height: 2),
                   ShaderMask(
                     shaderCallback: (bounds) => AppUiConstants.secondaryGradient.createShader(bounds),
                     child: Text(
