@@ -4,7 +4,7 @@ import 'package:trading_app_demo/features/market_watch/presentation/models/marke
 import 'package:trading_app_demo/ui/components/components.barrel.dart';
 
 void main() {
-  Future<void> _pumpWithHeight(
+  Future<void> pumpWithHeight(
     WidgetTester tester, {
     required double height,
     required Widget child,
@@ -29,7 +29,7 @@ void main() {
     const heights = [36.0, 50.0, 64.0, 80.0];
 
     for (final height in heights) {
-      await _pumpWithHeight(
+      await pumpWithHeight(
         tester,
         height: height,
         child: MarketCategoryTabBar(
@@ -44,7 +44,7 @@ void main() {
     const heights = [36.0, 48.0, 56.0, 72.0];
 
     for (final height in heights) {
-      await _pumpWithHeight(
+      await pumpWithHeight(
         tester,
         height: height,
         child: MarketSegmentedControl(
