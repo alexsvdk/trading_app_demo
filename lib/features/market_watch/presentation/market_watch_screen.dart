@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../../ui/components/responsive_grid.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../ui/components/components.barrel.dart';
 import '../../../ui/theme/app_ui_constants.dart';
+import '../../../core/di/injection_container.dart';
+import '../../wallet/presentation/bloc/wallet_bloc.dart';
+import '../../wallet/presentation/bloc/wallet_event.dart';
+import '../../wallet/presentation/bloc/wallet_state.dart';
 
 /// Market Watch Screen - Home screen showing trading contracts
 class MarketWatchScreen extends StatelessWidget {
@@ -8,114 +15,84 @@ class MarketWatchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: OrientationBuilder(
-        builder: (context, orientation) {
-          final isLandscape = orientation == Orientation.landscape;
-          
-          return CustomScrollView(
-            slivers: [
-              // Header
-              SliverToBoxAdapter(
-                child: _buildHeader(context, isLandscape),
-              ),
-              
-              // Market Category Tabs
-              SliverToBoxAdapter(
-                child: _buildMarketTabs(context, isLandscape),
-              ),
-              
-              // Search Bar
-              SliverToBoxAdapter(
-                child: _buildSearchBar(context, isLandscape),
-              ),
-              
-              // Section Header
-              SliverToBoxAdapter(
-                child: _buildSectionHeader(context),
-              ),
-              
-              // Contract List (Grid in landscape, List in portrait)
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppUiConstants.screenPadding,
-                  vertical: AppUiConstants.smallSpacing,
+    return BlocProvider(
+      create: (context) => getIt<WalletBloc>()..add(WalletStarted()),
+      child: Scaffold(
+        body: OrientationBuilder(
+          builder: (context, orientation) {
+            final isLandscape = orientation == Orientation.landscape;
+
+            return CustomScrollView(
+              slivers: [
+                // Header
+                SliverToBoxAdapter(child: _buildHeader(context, isLandscape)),
+
+                // Market Category Tabs
+                SliverToBoxAdapter(
+                  child: _buildMarketTabs(context, isLandscape),
                 ),
-                sliver: isLandscape
-                    ? _buildContractGrid(context)
-                    : _buildContractList(context),
-              ),
-            ],
-          );
-        },
+
+                // Search Bar
+                SliverToBoxAdapter(
+                  child: _buildSearchBar(context, isLandscape),
+                ),
+
+                // Section Header
+                SliverToBoxAdapter(child: _buildSectionHeader(context)),
+
+                // Contract List (Grid in landscape, List in portrait)
+                SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppUiConstants.screenPadding,
+                    vertical: AppUiConstants.smallSpacing,
+                  ),
+                  sliver:
+                      isLandscape &&
+                          AppUiConstants.calculateGridColumns(
+                                MediaQuery.widthOf(context) -
+                                    2 * AppUiConstants.screenPadding,
+                              ) >
+                              1
+                      ? _buildContractGrid(context)
+                      : _buildContractList(context),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
 
   Widget _buildHeader(BuildContext context, bool isLandscape) {
-    final headerHeight = AppUiConstants.getHeaderHeight(isLandscape);
-    
-    return Container(
-      height: headerHeight,
-      decoration: AppUiConstants.headerDecoration,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppUiConstants.screenPadding,
-        vertical: AppUiConstants.smallSpacing,
-      ),
-      child: Row(
-        children: [
-          // App Logo
-          const Icon(Icons.menu, color: AppUiConstants.whiteText),
-          const SizedBox(width: AppUiConstants.elementSpacing),
-          // Balance Display
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'Balance',
-                style: AppUiConstants.smallText.copyWith(
-                  color: AppUiConstants.whiteText.withValues(alpha: 0.7),
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                '122200',
-                style: AppUiConstants.mediumHeading.copyWith(
-                  color: AppUiConstants.whiteText,
-                ),
-              ),
-            ],
-          ),
-          const Spacer(),
-          // Notification Bell
-          Stack(
-            children: [
-              const Icon(Icons.notifications, color: AppUiConstants.whiteText),
-              Positioned(
-                right: 0,
-                top: 0,
-                child: Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: AppUiConstants.notificationBadgeDecoration,
-                  child: Text(
-                    '10',
-                    style: AppUiConstants.tinyText.copyWith(
-                      color: AppUiConstants.whiteText,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+    return BlocBuilder<WalletBloc, WalletState>(
+      builder: (context, state) {
+        final balance = state is WalletLoaded ? state.wallet.balance : '122200';
+        final notificationCount = state is WalletLoaded
+            ? state.notifications.count
+            : 10;
+
+        return AppHeader(
+          balance: balance,
+          notificationCount: notificationCount,
+          isLandscape: isLandscape,
+          onMenuTap: () {
+            // TODO: Implement menu action
+          },
+          onWalletTap: () {
+            context.go('/portfolio');
+          },
+          onNotificationTap: () {
+            // TODO: Implement notification action
+          },
+        );
+      },
     );
   }
 
   Widget _buildMarketTabs(BuildContext context, bool isLandscape) {
     final tabBarHeight = AppUiConstants.getTabBarHeight(isLandscape);
-    
+
     return Container(
       height: tabBarHeight,
       padding: const EdgeInsets.symmetric(
@@ -125,25 +102,48 @@ class MarketWatchScreen extends StatelessWidget {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          _buildTab(context, 'Indian Market', 'assets/images/tabs/indian_market.png', true),
-          _buildTab(context, 'International', 'assets/images/tabs/International.png', false),
-          _buildTab(context, 'Forex Futures', 'assets/images/tabs/forex.png', false),
-          _buildTab(context, 'Crypto Futures', 'assets/images/tabs/crypto.png', false),
+          _buildTab(
+            context,
+            'Indian Market',
+            'assets/images/tabs/indian_market.png',
+            true,
+          ),
+          _buildTab(
+            context,
+            'International',
+            'assets/images/tabs/International.png',
+            false,
+          ),
+          _buildTab(
+            context,
+            'Forex Futures',
+            'assets/images/tabs/forex.png',
+            false,
+          ),
+          _buildTab(
+            context,
+            'Crypto Futures',
+            'assets/images/tabs/crypto.png',
+            false,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildTab(BuildContext context, String label, String assetPath, bool isActive) {
+  Widget _buildTab(
+    BuildContext context,
+    String label,
+    String assetPath,
+    bool isActive,
+  ) {
     return Container(
       margin: const EdgeInsets.only(right: AppUiConstants.elementSpacing),
       padding: const EdgeInsets.symmetric(
         horizontal: AppUiConstants.mediumSpacing,
         vertical: AppUiConstants.smallSpacing,
       ),
-      decoration: isActive
-          ? AppUiConstants.activeTabDecoration
-          : null,
+      decoration: isActive ? AppUiConstants.activeTabDecoration : null,
       child: Row(
         children: [
           Image.asset(
@@ -171,7 +171,7 @@ class MarketWatchScreen extends StatelessWidget {
 
   Widget _buildSearchBar(BuildContext context, bool isLandscape) {
     final searchBarHeight = AppUiConstants.getSearchBarHeight(isLandscape);
-    
+
     return Container(
       height: searchBarHeight,
       margin: const EdgeInsets.symmetric(
@@ -214,10 +214,7 @@ class MarketWatchScreen extends StatelessWidget {
         horizontal: AppUiConstants.screenPadding,
         vertical: AppUiConstants.smallSpacing,
       ),
-      child: Text(
-        'NSE Futures',
-        style: AppUiConstants.mediumHeading,
-      ),
+      child: Text('NSE Futures', style: AppUiConstants.mediumHeading),
     );
   }
 
@@ -268,10 +265,7 @@ class MarketWatchScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  '25 JAN',
-                  style: AppUiConstants.smallText,
-                ),
+                Text('25 JAN', style: AppUiConstants.smallText),
               ],
             ),
           ),
@@ -318,10 +312,7 @@ class MarketWatchScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppUiConstants.primaryBackground,
         borderRadius: BorderRadius.circular(AppUiConstants.cardBorderRadius),
-        border: Border.all(
-          color: AppUiConstants.lightBorder,
-          width: 1,
-        ),
+        border: Border.all(color: AppUiConstants.lightBorder, width: 1),
       ),
       padding: const EdgeInsets.all(AppUiConstants.mediumSpacing),
       child: Column(
@@ -342,10 +333,7 @@ class MarketWatchScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  Text(
-                    '25 JAN',
-                    style: AppUiConstants.smallText,
-                  ),
+                  Text('25 JAN', style: AppUiConstants.smallText),
                 ],
               ),
               Icon(
@@ -379,7 +367,10 @@ class MarketWatchScreen extends StatelessWidget {
                 children: [
                   _buildActionButton('BUY', AppUiConstants.buyButtonDecoration),
                   const SizedBox(width: AppUiConstants.buttonSpacing),
-                  _buildActionButton('SELL', AppUiConstants.sellButtonDecoration),
+                  _buildActionButton(
+                    'SELL',
+                    AppUiConstants.sellButtonDecoration,
+                  ),
                 ],
               ),
             ],
@@ -395,10 +386,7 @@ class MarketWatchScreen extends StatelessWidget {
       height: AppUiConstants.buttonHeight,
       decoration: decoration,
       alignment: Alignment.center,
-      child: Text(
-        text,
-        style: AppUiConstants.buttonText,
-      ),
+      child: Text(text, style: AppUiConstants.buttonText),
     );
   }
 }

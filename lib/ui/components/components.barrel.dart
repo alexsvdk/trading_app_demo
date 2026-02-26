@@ -3,3 +3,7 @@
 // Other files
 export 'responsive_grid.dart';
 export 'bottom_nav_bar.dart';
+
+// App header
+export 'app_header/app_header.dart';
+export 'app_header/app_header.barrel.dart';

@@ -9,6 +9,7 @@ class AppUiConstants {
   static const Color brandGradientStart = Color(0xFF436EDD); // Blue
   static const Color brandGradientMiddle = Color(0xFFAF7CE3); // Light Purple
   static const Color brandGradientEnd = Color(0xFFAF69C7); // Purple
+  static const Color brandShadow = Color(0xFFC28FEA); // Light Purple Shadow
 
   // Secondary Gradient Colors
   static const Color secondaryGradientStart = Color(0xFF6768E1); // Purple
@@ -81,7 +82,7 @@ class AppUiConstants {
   static const double navbarShadowLeftBlur = 28.0;
   static const double navbarShadowLeftOffset = -3.0;
   static const double navbarShadowLeftOpacity = 0.25;
-  
+
   static const double navbarShadowRightBlur = 4.0;
   static const double navbarShadowRightOffset = 7.0;
   static const double navbarShadowRightOpacity = 0.25;
@@ -92,9 +93,9 @@ class AppUiConstants {
   // - Contract info: ~180px (name + date + icon + spacing)
   // - Price info: ~320px (price + percentage + 2 buttons + spacing)
   // - Minimum width: max(180px, 320px) + 24px = ~344px
-  static const double gridMinCardWidth = 340.0;
-  static const double gridMaxCardWidth = 400.0;
-  static const double gridCardAspectRatio = 3.0;
+  static const double gridMinCardWidth = 300.0;
+  static const double gridMaxCardWidth = 380.0;
+  static const double gridCardAspectRatio = 2.2;
   static const double gridCrossAxisSpacing = 12.0;
   static const double gridMainAxisSpacing = 12.0;
 
@@ -340,10 +341,13 @@ class AppUiConstants {
   /// Returns optimal number of columns (1-4) based on card width constraints
   static int calculateGridColumns(double availableWidth) {
     // Calculate max columns based on minimum card width
-    final maxColumns = (availableWidth / gridMinCardWidth).floor();
+    final maxColumns =
+        (availableWidth / (gridMinCardWidth + 2 * gridCrossAxisSpacing))
+            .floor();
 
     // Calculate min columns based on maximum card width
-    final minColumns = (availableWidth / gridMaxCardWidth).ceil();
+    final minColumns =
+        (availableWidth / (gridMaxCardWidth + 2 * gridCrossAxisSpacing)).round();
 
     // Use the larger of the two to ensure optimal card sizing
     // If minColumns > maxColumns, it means we can fit fewer columns with max card width
