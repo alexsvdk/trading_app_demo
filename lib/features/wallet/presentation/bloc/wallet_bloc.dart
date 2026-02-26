@@ -59,7 +59,6 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
   ) async {
     if (state is WalletLoaded) {
       final currentState = state as WalletLoaded;
-      emit(currentState.copyWith());
 
       final result = await getBalanceUseCase();
 
@@ -81,7 +80,6 @@ class WalletBloc extends Bloc<WalletEvent, WalletState> {
   ) async {
     if (state is WalletLoaded) {
       final currentState = state as WalletLoaded;
-      emit(currentState.copyWith());
 
       final result = await getNotificationsUseCase();
 

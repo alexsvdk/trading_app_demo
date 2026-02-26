@@ -20,6 +20,8 @@ class WalletWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final balanceFontSize = isLandscape ? 14.0 : 16.0;
+    final labelFontSize = isLandscape ? 10.0 : 12.0;
+    final verticalPadding = isLandscape ? 4.0 : AppUiConstants.smallSpacing;
 
     return Container(
       decoration: BoxDecoration(
@@ -40,9 +42,9 @@ class WalletWidget extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(AppUiConstants.buttonBorderRadius),
         child: Padding(
-          padding: const EdgeInsets.symmetric(
+          padding: EdgeInsets.symmetric(
             horizontal: AppUiConstants.smallSpacing,
-            vertical: AppUiConstants.smallSpacing,
+            vertical: verticalPadding,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -54,16 +56,30 @@ class WalletWidget extends StatelessWidget {
                   Assets.images.navbar.wallet,
                 ),
               ),
-              const SizedBox(width: 2),
-              ShaderMask(
-                shaderCallback: (bounds) => AppUiConstants.secondaryGradient.createShader(bounds),
-                child: Text(
-                  balance,
-                  style: AppUiConstants.mediumHeading.copyWith(
-                    fontSize: balanceFontSize,
-                    color: AppUiConstants.headerContentColor,
+              const SizedBox(width: 6),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Balance',
+                    style: AppUiConstants.secondaryTextStyle.copyWith(
+                      fontSize: labelFontSize,
+                      color: AppUiConstants.headerContentColor,
+                    ),
                   ),
-                ),
+                  SizedBox(height: isLandscape ? 0.0 : 2.0),
+                  ShaderMask(
+                    shaderCallback: (bounds) => AppUiConstants.secondaryGradient.createShader(bounds),
+                    child: Text(
+                      balance,
+                      style: AppUiConstants.mediumHeading.copyWith(
+                        fontSize: balanceFontSize,
+                        color: AppUiConstants.headerContentColor,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
